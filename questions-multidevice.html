@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCET IQAC Portal | Multi-Device Sync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-dark: #1e429f;
+            --primary-light: #e1effe;
+            --secondary: #ff6b35;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #111827;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary-dark) 0%, #0f2b6e 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, .15);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .05));
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: 1px solid rgba(255, 255, 255, .15);
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            opacity: .7;
+            margin-top: 2px;
+        }
+
+        .nav-menu {
+            padding: 16px 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            margin: 2px 8px;
+            border-radius: .75rem;
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 14px;
+            color: rgba(255, 255, 255, .75);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, .08);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, .12);
+            color: white;
+        }
+
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #d1fae5;
+            border-radius: .5rem;
+            font-size: 13px;
+            font-weight: 600;
+            color: #065f46;
+        }
+
+        .status-indicator.offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .content {
+            padding: 24px 28px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: .75rem;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all .2s;
+            background: white;
+            color: var(--gray-800);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 86, 219, .08);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: .75rem;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(26, 86, 219, .3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .questions-list {
+            list-style: none;
+        }
+
+        .question-item {
+            padding: 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: .75rem;
+            margin-bottom: 12px;
+            background: var(--gray-50);
+            transition: all .2s;
+        }
+
+        .question-item:hover {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-weight: 600;
+            color: var(--gray-900);
+            flex: 1;
+        }
+
+        .question-meta {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 8px;
+        }
+
+        .sync-status {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .active-devices {
+            font-size: 12px;
+            padding: 12px;
+            background: #dbeafe;
+            border-left: 4px solid var(--info);
+            border-radius: .5rem;
+            margin-bottom: 16px;
+            color: #1e40af;
+        }
+
+        .device-item {
+            font-size: 12px;
+            padding: 6px 0;
+        }
+
+        .device-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--info);
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon">📊</div>
+                    <div class="brand-text">
+                        <h1>GCET IQAC</h1>
+                        <p>Multi-Device</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <i class="fas fa-list"></i>
+                    <span>Questions</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Top Bar -->
+            <div class="topbar">
+                <h2 style="font-size: 22px; font-weight: 700; color: var(--gray-900);">Questions Portal</h2>
+                <div class="status-indicator" id="syncStatus">
+                    <span class="status-dot"></span>
+                    <span>Connected</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Active Devices -->
+                <div class="active-devices" id="activeDevices">
+                    <strong>📱 Active Devices:</strong>
+                    <div class="device-item" id="devicesList">Loading...</div>
+                </div>
+
+                <!-- Add Question Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Add New Question</div>
+                    </div>
+                    <div class="card-body">
+                        <form id="questionForm">
+                            <div class="form-group">
+                                <label class="form-label">Question</label>
+                                <input type="text" class="form-input" id="questionInput" placeholder="Enter your question..." required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-textarea" id="descriptionInput" placeholder="Add optional description..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Question
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Questions List -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Questions</div>
+                        <span id="questionCount" style="color: var(--gray-500); font-size: 14px;">0 questions</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="questions-list" id="questionsList">
+                            <li style="padding: 40px; text-align: center; color: var(--gray-500);">
+                                No questions yet. Add one to get started!
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            WS_URL: 'ws://localhost:8080', // Change to your WebSocket server
+            STORAGE_KEY: 'iqac_questions',
+            DEVICE_ID: generateDeviceId()
+        };
+
+        // Utilities
+        function generateDeviceId() {
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
+        // State Management
+        let questions = [];
+        let connectedDevices = new Set();
+        let ws = null;
+
+        // Load initial data
+        function loadQuestions() {
+            const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
+            questions = stored ? JSON.parse(stored) : [];
+            renderQuestions();
+        }
+
+        // Save to localStorage
+        function saveQuestions() {
+            localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(questions));
+        }
+
+        // Render questions
+        function renderQuestions() {
+            const list = document.getElementById('questionsList');
+            const count = document.getElementById('questionCount');
+
+            if (questions.length === 0) {
+                list.innerHTML = '<li style="padding: 40px; text-align: center; color: var(--gray-500);">No questions yet. Add one to get started!</li>';
+                count.textContent = '0 questions';
+                return;
+            }
+
+            list.innerHTML = questions.map((q, idx) => `
+                <li class="question-item">
+                    <div class="question-header">
+                        <div class="question-text">${escapeHtml(q.text)}</div>
+                        <button class="btn btn-sm" style="background: #fee2e2; color: #991b1b; border: none; padding: 4px 12px;" onclick="deleteQuestion(${idx})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    ${q.description ? `<p style="color: var(--gray-600); font-size: 14px; margin: 8px 0 0 0;">${escapeHtml(q.description)}</p>` : ''}
+                    <div class="question-meta">
+                        <span>Added: ${new Date(q.timestamp).toLocaleString()}</span>
+                        <span class="sync-status" style="margin-left: 12px;">Synced ✓</span>
+                    </div>
+                </li>
+            `).join('');
+
+            count.textContent = `${questions.length} question${questions.length !== 1 ? 's' : ''}`;
+        }
+
+        // Add question
+        function addQuestion(text, description) {
+            const question = {
+                id: 'q_' + Date.now(),
+                text,
+                description,
+                timestamp: new Date().toISOString(),
+                addedBy: CONFIG.DEVICE_ID
+            };
+            questions.push(question);
+            saveQuestions();
+            renderQuestions();
+            broadcastChange('question_added', question);
+        }
+
+        // Delete question
+        function deleteQuestion(idx) {
+            if (confirm('Are you sure?')) {
+                const deleted = questions.splice(idx, 1)[0];
+                saveQuestions();
+                renderQuestions();
+                broadcastChange('question_deleted', deleted);
+            }
+        }
+
+        // Broadcast changes to other devices
+        function broadcastChange(type, data) {
+            const message = {
+                type,
+                data,
+                deviceId: CONFIG.DEVICE_ID,
+                timestamp: new Date().toISOString()
+            };
+
+            // Send via WebSocket if connected
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(message));
+            }
+
+            // Fallback: Use localStorage change event
+            localStorage.setItem('lastChange_' + Date.now(), JSON.stringify(message));
+        }
+
+        // Handle form submission
+        document.getElementById('questionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('questionInput').value.trim();
+            const description = document.getElementById('descriptionInput').value.trim();
+
+            if (text) {
+                addQuestion(text, description);
+                document.getElementById('questionInput').value = '';
+                document.getElementById('descriptionInput').value = '';
+            }
+        });
+
+        // WebSocket Connection
+        function connectWebSocket() {
+            try {
+                ws = new WebSocket(CONFIG.WS_URL);
+
+                ws.onopen = () => {
+                    console.log('Connected to WebSocket');
+                    updateSyncStatus(true);
+                    ws.send(JSON.stringify({
+                        type: 'device_connected',
+                        deviceId: CONFIG.DEVICE_ID
+                    }));
+                };
+
+                ws.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    handleWebSocketMessage(message);
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    updateSyncStatus(false);
+                };
+
+                ws.onclose = () => {
+                    console.log('Disconnected from WebSocket');
+                    updateSyncStatus(false);
+                    setTimeout(connectWebSocket, 3000);
+                };
+            } catch (e) {
+                console.error('WebSocket connection failed:', e);
+                updateSyncStatus(false);
+            }
+        }
+
+        // Handle incoming WebSocket messages
+        function handleWebSocketMessage(message) {
+            if (message.deviceId === CONFIG.DEVICE_ID) return; // Ignore own messages
+
+            if (message.type === 'question_added') {
+                questions.push(message.data);
+                saveQuestions();
+                renderQuestions();
+            } else if (message.type === 'question_deleted') {
+                questions = questions.filter(q => q.id !== message.data.id);
+                saveQuestions();
+                renderQuestions();
+            } else if (message.type === 'devices_list') {
+                connectedDevices = new Set(message.devices);
+                updateDevicesList();
+            }
+        }
+
+        // Update sync status indicator
+        function updateSyncStatus(connected) {
+            const indicator = document.getElementById('syncStatus');
+            if (connected) {
+                indicator.className = 'status-indicator';
+                indicator.innerHTML = '<span class="status-dot"></span><span>Connected</span>';
+            } else {
+                indicator.className = 'status-indicator offline';
+                indicator.innerHTML = '<span class="status-dot offline"></span><span>Offline</span>';
+            }
+        }
+
+        // Update devices list
+        function updateDevicesList() {
+            const list = document.getElementById('devicesList');
+            if (connectedDevices.size === 0) {
+                list.innerHTML = '<div class="device-item">No other devices connected</div>';
+            } else {
+                list.innerHTML = Array.from(connectedDevices).map(dev => 
+                    `<div class="device-item"><span class="device-dot"></span>${dev}</div>`
+                ).join('');
+            }
+        }
+
+        // Utility: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Listen for localStorage changes from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key && e.key.startsWith('lastChange_')) {
+                const message = JSON.parse(e.newValue);
+                if (message.deviceId !== CONFIG.DEVICE_ID) {
+                    handleWebSocketMessage(message);
+                }
+            }
+        });
+
+        // Initialize
+        loadQuestions();
+        connectWebSocket();
+    </script>
+</body>
+</html>
